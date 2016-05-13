@@ -14,6 +14,7 @@ import java.util.HashMap;
 public class Environment implements InterfaceEnvironment{
     private HashMap<String, Arc> matrice;
     private ArrayList<String> noeuds;
+    private Arc[][] arcs;
 
     public Environment(ArrayList<String> noeuds) {
         this.noeuds = noeuds;

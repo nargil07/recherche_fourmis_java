@@ -10,5 +10,7 @@ package fr.iutvalence.recherchefourmis;
  * @author antony
  */
 public class Launcher {
-    
+    public static void main(String[] args) {
+        
+    }
 }

@@ -10,5 +10,6 @@ package fr.iutvalence.recherchefourmis.environment;
  * @author antony
  */
 public class Arc {
-    
+    public int pheromones = 0;
+    public int metrique = 0;
 }

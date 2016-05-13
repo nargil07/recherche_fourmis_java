@@ -5,10 +5,13 @@
  */
 package fr.iutvalence.recherchefourmis.environment;
 
+import java.util.HashMap;
+
 /**
  *
  * @author antony
  */
 public class Environment {
+    private HashMap<String, Arc> matrice;
     
 }

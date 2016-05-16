@@ -3,13 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.iutvalence.recherchefourmis.environment;
+package fr.iutvalence.recherchefourmis.entite;
 
 /**
  *
  * @author antony
  */
-public class Arc {
-    public int pheromones = 0;
-    public int metrique = 1;
+public enum EnumModeFourmis {
+    /**
+     * 
+     */
+    EXPLORATRICE,
+    /**
+     * 
+     */
+    SUIVEUSE;
 }

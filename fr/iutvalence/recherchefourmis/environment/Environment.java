@@ -6,9 +6,10 @@
 package fr.iutvalence.recherchefourmis.environment;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,7 +45,7 @@ public class Environment implements InterfaceEnvironment {
         arcs = new Arc[noeuds.size()][noeuds.size()];
         for (int i = 0; i < noeuds.size(); i++) {
             for (int j = i + 1; j < noeuds.size(); j++) {
-                arcs[i][j] = new Arc();
+                arcs[i][j] = new Arc(findNoeud(i), findNoeud(j));
             }
         }
     }
@@ -62,6 +63,17 @@ public class Environment implements InterfaceEnvironment {
         }
         return index;
     }
+    
+    public String findNoeud(int i){
+        for (Map.Entry<String, Integer> entry : noeuds.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            if(value == i){
+                return key;
+            }
+        }
+        return null;
+    }
 
     public void setArcMetrique(String debut, String fin, int metrique) {
         Arc arc = getArc(debut, fin);
@@ -70,7 +82,6 @@ public class Environment implements InterfaceEnvironment {
                 arc.metrique = metrique;
             }
         }
-
     }
 
     @Override
@@ -97,7 +108,7 @@ public class Environment implements InterfaceEnvironment {
         for (int i = 0; i < this.arcs.length; i++) {
             Arc arc = this.arcs[i][intDepart];
             if (arc != null && arc.metrique != 0) {
-                results.add(this.arcs[intDepart][i]);
+                results.add(this.arcs[i][intDepart]);
             }
 
         }

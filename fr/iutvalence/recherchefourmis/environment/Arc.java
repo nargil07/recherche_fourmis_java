@@ -12,4 +12,30 @@ package fr.iutvalence.recherchefourmis.environment;
 public class Arc {
     public int pheromones = 0;
     public int metrique = 1;
+    public String noeudDep;
+    public String noeudFin;
+
+    public Arc(String noeudFin, String noeudDep) {
+        this.noeudDep = noeudDep;
+        this.noeudFin = noeudFin;
+    }
+
+    public String getNoeudDep() {
+        return noeudDep;
+    }
+
+    public void setNoeudDep(String noeudDep) {
+        this.noeudDep = noeudDep;
+    }
+
+    public String getNoeudFin() {
+        return noeudFin;
+    }
+
+    public void setNoeudFin(String noeudFin) {
+        this.noeudFin = noeudFin;
+    }
+    
+    
+    
 }

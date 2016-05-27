@@ -48,7 +48,7 @@ public class Launcher {
         environment.getArc("D", "F").metrique = 3;
         environment.getArc("E", "F").metrique = 1;
         
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < 500; i++){
             Thread t = new Thread(new Fourmi(environment, EnumModeFourmis.SUIVEUSE, "Foumis-" + String.valueOf(i)));
             t.start();
             Thread.sleep(40);

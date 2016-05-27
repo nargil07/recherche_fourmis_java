@@ -33,6 +33,7 @@ public class Fourmi implements Runnable {
      * Permettra quand on sera arrivé à destination de rebrousser chemin.
      */
     public List<Arc> routeParcourus = new ArrayList<>();
+    public List<Arc> routeBannis = new ArrayList<>();
     public List<String> noeudsParcourus = new ArrayList<>();
 
     public Fourmi(Environment environment, EnumModeFourmis mode, String name) {
@@ -63,7 +64,7 @@ public class Fourmi implements Runnable {
                     noeudsParcourus.add(noeudOuAller);
                     noeudActuel = noeudOuAller;
                     this.syntheseFourmis = syntheseFourmis + " - " + noeudActuel;
-                    System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                   // System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
                 } else {
                     reculer();
                 }
@@ -79,11 +80,14 @@ public class Fourmi implements Runnable {
     private void reculer() {
         Arc arc = null;
         try {
-            if (modeAvancer) {
-                arc = routeParcourus.get(routeParcourus.size() - 1);
-            } else {
-                arc = routeParcourus.remove(routeParcourus.size() - 1);
+            if(routeParcourus.size() == 0){
+                System.out.println("fr.iutvalence.recherchefourmis.entite.Fourmi.reculer()");
+            }
+            arc = routeParcourus.remove(routeParcourus.size() - 1);
+            if (!modeAvancer) {
                 noeudsParcourus.remove(noeudsParcourus.size() - 1);
+            }else{
+                routeBannis.add(arc);
             }
 
             Thread.sleep(arc.metrique * 100);
@@ -93,7 +97,7 @@ public class Fourmi implements Runnable {
                 noeudActuel = arc.getNoeudFin();
             }
             this.syntheseFourmis = this.syntheseFourmis + " - " + this.noeudActuel;
-            System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+            //System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
         } catch (InterruptedException ex) {
             Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -121,17 +125,18 @@ public class Fourmi implements Runnable {
         Arc result = null;
 
         float total = 0;
-
-        Arc[] cheminPossible = environment.getArcsPossible(noeudActuel, routeParcourus);
+        List<Arc>cheminImpossible = new ArrayList<>(routeBannis);
+        cheminImpossible.addAll(routeParcourus);
+        Arc[] cheminPossible = environment.getArcsPossible(noeudActuel, cheminImpossible);
         float[] tabPourcentage = new float[cheminPossible.length];
         for (int i = 0; i < cheminPossible.length; i++) {
             if (i < 1) {
                 Arc arc = cheminPossible[i];
-                tabPourcentage[i] = (float) ((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * 1 + Math.pow(arc.pheromones, this.mode.getPourcentagePheromones()));
+                tabPourcentage[i] = (float) ((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * Math.pow(arc.pheromones, this.mode.getPourcentagePheromones()));
                 total += tabPourcentage[i];
             } else {
                 Arc arc = cheminPossible[i];
-                tabPourcentage[i] = (float) (((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * 1 + Math.pow(arc.pheromones, this.mode.getPourcentagePheromones())));
+                tabPourcentage[i] = (float) (((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * Math.pow(arc.pheromones, this.mode.getPourcentagePheromones())));
                 total += tabPourcentage[i];
                 tabPourcentage[i] = tabPourcentage[i] + tabPourcentage[i - 1];
             }

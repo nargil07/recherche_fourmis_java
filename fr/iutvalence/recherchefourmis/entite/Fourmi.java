@@ -27,6 +27,7 @@ public class Fourmi implements Runnable {
     public String noeudActuel = "N";
     private String noeudArrive = "F";
     private String name;
+    private String syntheseFourmis;
     /**
      * Permettra quand on sera arrivé à destination de rebrousser chemin.
      */
@@ -38,6 +39,7 @@ public class Fourmi implements Runnable {
         this.mode = mode;
         this.noeudActuel = "N";
         this.name = name;
+        this.syntheseFourmis = this.noeudActuel;
     }
 
     /**
@@ -58,7 +60,7 @@ public class Fourmi implements Runnable {
                     routeParcourus.add(arc);
                     noeudsParcourus.add(noeudOuAller);
                     noeudActuel = noeudOuAller;
-
+                    this.syntheseFourmis = syntheseFourmis + " - " + noeudActuel;
                     System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
                 } else {
                     arc = routeParcourus.remove(routeParcourus.size() - 1);
@@ -69,7 +71,7 @@ public class Fourmi implements Runnable {
                     } else {
                         noeudActuel = arc.getNoeudFin();
                     }
-
+                    this.syntheseFourmis = syntheseFourmis + " - " + noeudActuel;
                     System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
                 }
             } else {
@@ -81,7 +83,7 @@ public class Fourmi implements Runnable {
                 } else {
                     noeudActuel = arc.getNoeudFin();
                 }
-
+                this.syntheseFourmis = this.syntheseFourmis + " - " + this.noeudActuel;
                 System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
             }
 
@@ -143,27 +145,26 @@ public class Fourmi implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            while (!noeudActuel.equals(noeudArrive)) {
-                avancer();
-            }
-            while (routeParcourus.size() > 0) {
-                Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
-                noeudsParcourus.remove(noeudsParcourus.size() - 1);
-                try {
-                    Thread.sleep(arc.metrique * 100);
-                    if (arc.getNoeudFin().equals(noeudActuel)) {
-                        noeudActuel = arc.getNoeudDep();
-                    } else {
-                        noeudActuel = arc.getNoeudFin();
-                    }
-
-                    System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
+        while (!noeudActuel.equals(noeudArrive)) {
+            avancer();
+        }
+        while (routeParcourus.size() > 0) {
+            Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
+            noeudsParcourus.remove(noeudsParcourus.size() - 1);
+            try {
+                Thread.sleep(arc.metrique * 100);
+                if (arc.getNoeudFin().equals(noeudActuel)) {
+                    noeudActuel = arc.getNoeudDep();
+                } else {
+                    noeudActuel = arc.getNoeudFin();
                 }
+
+                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        System.out.println(this.syntheseFourmis);
 
     }
 }

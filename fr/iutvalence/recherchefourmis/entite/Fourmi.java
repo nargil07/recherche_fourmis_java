@@ -21,12 +21,13 @@ public class Fourmi implements Runnable {
     /**
      * Utile plus tard quand on devra gérer les differentes fourmis.
      */
-    private Environment environment;
-    private EnumModeFourmis mode;
+    private final Environment environment;
+    private final EnumModeFourmis mode;
+    private boolean modeAvancer = true;
 
     public String noeudActuel = "N";
-    private String noeudArrive = "F";
-    private String name;
+    private final String noeudArrive = "F";
+    private final String name;
     private String syntheseFourmis;
     /**
      * Permettra quand on sera arrivé à destination de rebrousser chemin.
@@ -76,9 +77,15 @@ public class Fourmi implements Runnable {
     }
 
     private void reculer() {
+        Arc arc = null;
         try {
-            Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
-            noeudsParcourus.remove(noeudsParcourus.size() - 1);
+            if (modeAvancer) {
+                arc = routeParcourus.get(routeParcourus.size() - 1);
+            } else {
+                arc = routeParcourus.remove(routeParcourus.size() - 1);
+                noeudsParcourus.remove(noeudsParcourus.size() - 1);
+            }
+
             Thread.sleep(arc.metrique * 100);
             if (arc.getNoeudFin().equals(noeudActuel)) {
                 noeudActuel = arc.getNoeudDep();
@@ -148,8 +155,9 @@ public class Fourmi implements Runnable {
         while (!noeudActuel.equals(noeudArrive)) {
             avancer();
         }
+        modeAvancer = false;
         while (routeParcourus.size() > 0) {
-           reculer();
+            reculer();
         }
         System.out.println(this.syntheseFourmis);
 

@@ -47,18 +47,31 @@ public class Fourmi implements Runnable {
         Arc arc = choisir();
         String noeudOuAller = null;
         try {
-            if (arc.getNoeudFin().equals(noeudActuel)) {
-                noeudOuAller = arc.getNoeudDep();
-            } else {
-                noeudOuAller = arc.getNoeudFin();
-            }
-            if (!isNoeudParcourus(noeudOuAller)) {
-                Thread.sleep(arc.metrique * 100);
-                routeParcourus.add(arc);
-                noeudsParcourus.add(noeudOuAller);
-                noeudActuel = noeudOuAller;
+            if (arc != null) {
+                if (arc.getNoeudFin().equals(noeudActuel)) {
+                    noeudOuAller = arc.getNoeudDep();
+                } else {
+                    noeudOuAller = arc.getNoeudFin();
+                }
+                if (!isNoeudParcourus(noeudOuAller)) {
+                    Thread.sleep(arc.metrique * 100);
+                    routeParcourus.add(arc);
+                    noeudsParcourus.add(noeudOuAller);
+                    noeudActuel = noeudOuAller;
 
-                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                    System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                } else {
+                    arc = routeParcourus.remove(routeParcourus.size() - 1);
+                    noeudsParcourus.remove(noeudsParcourus.size() - 1);
+                    Thread.sleep(arc.metrique * 100);
+                    if (arc.getNoeudFin().equals(noeudActuel)) {
+                        noeudActuel = arc.getNoeudDep();
+                    } else {
+                        noeudActuel = arc.getNoeudFin();
+                    }
+
+                    System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                }
             } else {
                 arc = routeParcourus.remove(routeParcourus.size() - 1);
                 noeudsParcourus.remove(noeudsParcourus.size() - 1);
@@ -71,6 +84,7 @@ public class Fourmi implements Runnable {
 
                 System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
             }
+
         } catch (InterruptedException ex) {
             Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -95,6 +109,8 @@ public class Fourmi implements Runnable {
     }
 
     public Arc choisir() {
+        Arc result = null;
+
         float total = 0;
 
         Arc[] cheminPossible = environment.getArcsPossible(noeudActuel, routeParcourus);
@@ -113,35 +129,41 @@ public class Fourmi implements Runnable {
 
         }
 
-        double rand = Math.random();
-        int i = 0;
-        while (rand >= (tabPourcentage[i] / total)) {
-            i++;
+        if (cheminPossible.length > 0) {
+            double rand = Math.random();
+            int i = 0;
+            while (rand >= (tabPourcentage[i] / total)) {
+                i++;
+            }
+            result = cheminPossible[i];
         }
-        return cheminPossible[i];
+        return result;
 
     }
 
     @Override
     public void run() {
-        while (!noeudActuel.equals(noeudArrive)) {
-            avancer();
-        }
-        while (routeParcourus.size() > 0) {
-            Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
-            noeudsParcourus.remove(noeudsParcourus.size() - 1);
-            try {
-                Thread.sleep(arc.metrique * 100);
-                if (arc.getNoeudFin().equals(noeudActuel)) {
-                    noeudActuel = arc.getNoeudDep();
-                } else {
-                    noeudActuel = arc.getNoeudFin();
-                }
+        while (true) {
+            while (!noeudActuel.equals(noeudArrive)) {
+                avancer();
+            }
+            while (routeParcourus.size() > 0) {
+                Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
+                noeudsParcourus.remove(noeudsParcourus.size() - 1);
+                try {
+                    Thread.sleep(arc.metrique * 100);
+                    if (arc.getNoeudFin().equals(noeudActuel)) {
+                        noeudActuel = arc.getNoeudDep();
+                    } else {
+                        noeudActuel = arc.getNoeudFin();
+                    }
 
-                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
+
     }
 }

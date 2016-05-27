@@ -38,6 +38,7 @@ public class Fourmi implements Runnable {
         this.environment = environment;
         this.mode = mode;
         this.noeudActuel = "N";
+        this.noeudsParcourus.add(noeudActuel);
         this.name = name;
         this.syntheseFourmis = this.noeudActuel;
     }
@@ -63,30 +64,29 @@ public class Fourmi implements Runnable {
                     this.syntheseFourmis = syntheseFourmis + " - " + noeudActuel;
                     System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
                 } else {
-                    arc = routeParcourus.remove(routeParcourus.size() - 1);
-                    noeudsParcourus.remove(noeudsParcourus.size() - 1);
-                    Thread.sleep(arc.metrique * 100);
-                    if (arc.getNoeudFin().equals(noeudActuel)) {
-                        noeudActuel = arc.getNoeudDep();
-                    } else {
-                        noeudActuel = arc.getNoeudFin();
-                    }
-                    this.syntheseFourmis = syntheseFourmis + " - " + noeudActuel;
-                    System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                    reculer();
                 }
             } else {
-                arc = routeParcourus.remove(routeParcourus.size() - 1);
-                noeudsParcourus.remove(noeudsParcourus.size() - 1);
-                Thread.sleep(arc.metrique * 100);
-                if (arc.getNoeudFin().equals(noeudActuel)) {
-                    noeudActuel = arc.getNoeudDep();
-                } else {
-                    noeudActuel = arc.getNoeudFin();
-                }
-                this.syntheseFourmis = this.syntheseFourmis + " - " + this.noeudActuel;
-                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                reculer();
             }
 
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void reculer() {
+        try {
+            Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
+            noeudsParcourus.remove(noeudsParcourus.size() - 1);
+            Thread.sleep(arc.metrique * 100);
+            if (arc.getNoeudFin().equals(noeudActuel)) {
+                noeudActuel = arc.getNoeudDep();
+            } else {
+                noeudActuel = arc.getNoeudFin();
+            }
+            this.syntheseFourmis = this.syntheseFourmis + " - " + this.noeudActuel;
+            System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
         } catch (InterruptedException ex) {
             Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -149,20 +149,7 @@ public class Fourmi implements Runnable {
             avancer();
         }
         while (routeParcourus.size() > 0) {
-            Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
-            noeudsParcourus.remove(noeudsParcourus.size() - 1);
-            try {
-                Thread.sleep(arc.metrique * 100);
-                if (arc.getNoeudFin().equals(noeudActuel)) {
-                    noeudActuel = arc.getNoeudDep();
-                } else {
-                    noeudActuel = arc.getNoeudFin();
-                }
-
-                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
-            }
+           reculer();
         }
         System.out.println(this.syntheseFourmis);
 

@@ -51,7 +51,7 @@ public class Launcher {
         for(int i = 0; i < 6; i++){
             Thread t = new Thread(new Fourmi(environment, EnumModeFourmis.SUIVEUSE, "Foumis-" + String.valueOf(i)));
             t.start();
-            Thread.sleep(100);
+            Thread.sleep(40);
         }
     }
 }

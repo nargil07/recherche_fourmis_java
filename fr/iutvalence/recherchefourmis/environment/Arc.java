@@ -10,7 +10,7 @@ package fr.iutvalence.recherchefourmis.environment;
  * @author antony
  */
 public class Arc {
-    public int pheromones = 0;
+    public int pheromones = 1;
     public int metrique = 1;
     public String noeudDep;
     public String noeudFin;

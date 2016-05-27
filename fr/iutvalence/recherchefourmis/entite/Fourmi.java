@@ -31,12 +31,13 @@ public class Fourmi implements Runnable {
      * Permettra quand on sera arrivé à destination de rebrousser chemin.
      */
     public List<Arc> routeParcourus = new ArrayList<>();
+    public List<String> noeudsParcourus = new ArrayList<>();
 
-    public Fourmi(Environment environment, EnumModeFourmis mode) {
+    public Fourmi(Environment environment, EnumModeFourmis mode, String name) {
         this.environment = environment;
         this.mode = mode;
         this.noeudActuel = "N";
-        this.name = "four" + String.valueOf(Math.random());
+        this.name = name;
     }
 
     /**
@@ -44,62 +45,103 @@ public class Fourmi implements Runnable {
      */
     public void avancer() {
         Arc arc = choisir();
+        String noeudOuAller = null;
         try {
-            Thread.sleep(arc.metrique * 1000);
-            routeParcourus.add(arc);
-            if(arc.getNoeudFin().equals(noeudActuel)){
-                noeudActuel = arc.getNoeudDep();
-            }else{
-                noeudActuel = arc.getNoeudFin();
+            if (arc.getNoeudFin().equals(noeudActuel)) {
+                noeudOuAller = arc.getNoeudDep();
+            } else {
+                noeudOuAller = arc.getNoeudFin();
             }
-            
-            System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+            if (!isNoeudParcourus(noeudOuAller)) {
+                Thread.sleep(arc.metrique * 100);
+                routeParcourus.add(arc);
+                noeudsParcourus.add(noeudOuAller);
+                noeudActuel = noeudOuAller;
+
+                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+            } else {
+                arc = routeParcourus.remove(routeParcourus.size() - 1);
+                noeudsParcourus.remove(noeudsParcourus.size() - 1);
+                Thread.sleep(arc.metrique * 100);
+                if (arc.getNoeudFin().equals(noeudActuel)) {
+                    noeudActuel = arc.getNoeudDep();
+                } else {
+                    noeudActuel = arc.getNoeudFin();
+                }
+
+                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+            }
         } catch (InterruptedException ex) {
             Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private boolean isCheminParcourus(Arc arc){
+
+    private boolean isCheminParcourus(Arc arc) {
         int i = 0;
         boolean result = false;
-        do{
+        do {
             result = (arc == routeParcourus.get(i));
-        }while(!result && routeParcourus.size() < i);
+        } while (!result && routeParcourus.size() < i);
         return result;
     }
-    
-    public Arc choisir(){
+
+    private boolean isNoeudParcourus(String noeuds) {
+        for (String noeud : noeudsParcourus) {
+            if (noeuds.equals(noeud)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Arc choisir() {
         float total = 0;
 
-        Arc[] cheminPossible = environment.getArcsPossible(noeudActuel);
+        Arc[] cheminPossible = environment.getArcsPossible(noeudActuel, routeParcourus);
         float[] tabPourcentage = new float[cheminPossible.length];
         for (int i = 0; i < cheminPossible.length; i++) {
             if (i < 1) {
                 Arc arc = cheminPossible[i];
-                tabPourcentage[i] = (float) ((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * 1+Math.pow(arc.pheromones, this.mode.getPourcentagePheromones()));
+                tabPourcentage[i] = (float) ((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * 1 + Math.pow(arc.pheromones, this.mode.getPourcentagePheromones()));
                 total += tabPourcentage[i];
-            }else{
+            } else {
                 Arc arc = cheminPossible[i];
-                tabPourcentage[i] = (float) (((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * 1+Math.pow(arc.pheromones, this.mode.getPourcentagePheromones())));
+                tabPourcentage[i] = (float) (((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * 1 + Math.pow(arc.pheromones, this.mode.getPourcentagePheromones())));
                 total += tabPourcentage[i];
-                tabPourcentage[i] = tabPourcentage[i] + tabPourcentage[i-1]; 
+                tabPourcentage[i] = tabPourcentage[i] + tabPourcentage[i - 1];
             }
 
         }
 
         double rand = Math.random();
         int i = 0;
-        while(rand >= (tabPourcentage[i]/total)){
+        while (rand >= (tabPourcentage[i] / total)) {
             i++;
         }
         return cheminPossible[i];
-        
+
     }
 
     @Override
     public void run() {
-        while(true){
+        while (!noeudActuel.equals(noeudArrive)) {
             avancer();
+        }
+        while (routeParcourus.size() > 0) {
+            Arc arc = routeParcourus.remove(routeParcourus.size() - 1);
+            noeudsParcourus.remove(noeudsParcourus.size() - 1);
+            try {
+                Thread.sleep(arc.metrique * 100);
+                if (arc.getNoeudFin().equals(noeudActuel)) {
+                    noeudActuel = arc.getNoeudDep();
+                } else {
+                    noeudActuel = arc.getNoeudFin();
+                }
+
+                System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Fourmi.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

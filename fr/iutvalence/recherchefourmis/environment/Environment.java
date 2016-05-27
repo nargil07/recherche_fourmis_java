@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,12 +64,12 @@ public class Environment implements InterfaceEnvironment {
         }
         return index;
     }
-    
-    public String findNoeud(int i){
+
+    public String findNoeud(int i) {
         for (Map.Entry<String, Integer> entry : noeuds.entrySet()) {
             String key = entry.getKey();
             Integer value = entry.getValue();
-            if(value == i){
+            if (value == i) {
                 return key;
             }
         }
@@ -96,18 +97,34 @@ public class Environment implements InterfaceEnvironment {
         return arc;
     }
 
-    public Arc[] getArcsPossible(String noeudDepart) {
-
+    public Arc[] getArcsPossible(String noeudDepart, List<Arc> dejaParcourus) {
+        if(dejaParcourus == null){
+            dejaParcourus = new ArrayList<>();
+        }
         Set<Arc> results = new HashSet<>();
         int intDepart = findIndex(noeudDepart);
         for (Arc arc : this.arcs[intDepart]) {
-            if (arc != null && arc.metrique != 0) {
+            boolean parcourus = false;
+            for (Arc arcParcourus : dejaParcourus) {
+                if (arcParcourus == arc) {
+                    parcourus = true;
+                    break;
+                }
+            }
+            if (arc != null && arc.metrique != 0 && !parcourus) {
                 results.add(arc);
             }
         }
         for (int i = 0; i < this.arcs.length; i++) {
             Arc arc = this.arcs[i][intDepart];
-            if (arc != null && arc.metrique != 0) {
+            boolean parcourus = false;
+            for (Arc arcParcourus : dejaParcourus) {
+                if (arcParcourus == arc) {
+                    parcourus = true;
+                    break;
+                }
+            }
+            if (arc != null && arc.metrique != 0 && !parcourus) {
                 results.add(this.arcs[i][intDepart]);
             }
 

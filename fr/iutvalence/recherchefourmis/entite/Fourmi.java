@@ -46,7 +46,7 @@ public class Fourmi implements Runnable {
     }
 
     /**
-     * Fait avancer la fourmis suivant un algo
+     * Fait avancer la fourmis suivant un algo.
      */
     public void avancer() {
         Arc arc = choisir();
@@ -58,7 +58,7 @@ public class Fourmi implements Runnable {
                 } else {
                     noeudOuAller = arc.getNoeudFin();
                 }
-                if (!isNoeudParcourus(noeudOuAller)) {
+                if (!isNoeudParcourus(noeudOuAller)) {//verifie si le noeud a était parcourus
                     Thread.sleep(arc.metrique * 100);
                     routeParcourus.add(arc);
                     noeudsParcourus.add(noeudOuAller);
@@ -77,6 +77,10 @@ public class Fourmi implements Runnable {
         }
     }
 
+    /**
+     * Fais reculer la fourmis. Il verifie si on est en mode avancer ou non.
+     * Si on est en mode avancer quand il recule il met le chemin comme route bannis.
+     */
     private void reculer() {
         Arc arc = null;
         try {
@@ -103,6 +107,11 @@ public class Fourmi implements Runnable {
         }
     }
 
+    /**
+     * Verifie si le chemin à était parcourus.
+     * @param arc
+     * @return 
+     */
     private boolean isCheminParcourus(Arc arc) {
         int i = 0;
         boolean result = false;
@@ -121,6 +130,10 @@ public class Fourmi implements Runnable {
         return false;
     }
 
+    /**
+     * Choisir le chemin, en verifiant les chemin parcourus et verifier.
+     * @return 
+     */
     public Arc choisir() {
         Arc result = null;
 

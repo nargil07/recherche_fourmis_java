@@ -26,7 +26,6 @@ public class Launcher {
         list.add("N");
         Environment environment = new Environment(list);
         environment.getArc("N", "B").metrique = 5;
-        environment.getArc("N", "B").pheromones = 5;
         environment.getArc("N", "A").metrique = 1;
         environment.getArc("N", "C").metrique = 0;
         environment.getArc("N", "D").metrique = 0;
@@ -48,10 +47,16 @@ public class Launcher {
         environment.getArc("D", "F").metrique = 3;
         environment.getArc("E", "F").metrique = 1;
         
-        for(int i = 0; i < 500; i++){
-            Thread t = new Thread(new Fourmi(environment, EnumModeFourmis.SUIVEUSE, "Foumis-" + String.valueOf(i)));
+        for(int i = 0; i < 10; i++){
+            EnumModeFourmis mode = EnumModeFourmis.SUIVEUSE;
+            double rand = Math.random();
+            if(rand > 0.5){
+                mode = EnumModeFourmis.EXPLORATRICE;
+            }
+            Fourmi f = new Fourmi(environment, mode, "Foumis-" + String.valueOf(i));
+            Thread t = new Thread(f);
             t.start();
-            Thread.sleep(40);
+            Thread.sleep(4000);
         }
     }
 }

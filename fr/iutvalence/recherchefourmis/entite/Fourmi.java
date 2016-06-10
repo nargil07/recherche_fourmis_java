@@ -59,11 +59,13 @@ public class Fourmi implements Runnable {
                     noeudOuAller = arc.getNoeudFin();
                 }
                 if (!isNoeudParcourus(noeudOuAller)) {//verifie si le noeud a était parcourus
-                    Thread.sleep(arc.metrique * 100);
+                    System.out.println(String.format("%s : %s -> %s", this.name, this.noeudActuel, noeudOuAller));
+                    Thread.sleep(arc.metrique * 1000);
                     routeParcourus.add(arc);
                     noeudsParcourus.add(noeudOuAller);
                     noeudActuel = noeudOuAller;
                     this.syntheseFourmis = syntheseFourmis + " - " + noeudActuel;
+                    System.out.println(String.format("%s : arrivé à %s", this.name, this.noeudActuel));
                    // System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
                 } else {
                     reculer();
@@ -83,23 +85,24 @@ public class Fourmi implements Runnable {
      */
     private void reculer() {
         Arc arc = null;
+        String noeudOuAller = null;
         try {
-            if(routeParcourus.size() == 0){
-                System.out.println("fr.iutvalence.recherchefourmis.entite.Fourmi.reculer()");
-            }
             arc = routeParcourus.remove(routeParcourus.size() - 1);
-            if (!modeAvancer) {
+            if (!modeAvancer) {//si en mode reculer
                 noeudsParcourus.remove(noeudsParcourus.size() - 1);
+                arc.addPheromones(1);
             }else{
                 routeBannis.add(arc);
             }
-
-            Thread.sleep(arc.metrique * 100);
             if (arc.getNoeudFin().equals(noeudActuel)) {
-                noeudActuel = arc.getNoeudDep();
+                noeudOuAller = arc.getNoeudDep();
             } else {
-                noeudActuel = arc.getNoeudFin();
+                noeudOuAller = arc.getNoeudFin();
             }
+            System.out.println(String.format("%s : %s -> %s", this.name, this.noeudActuel, noeudOuAller));
+            Thread.sleep(arc.metrique * 1000);
+            System.out.println(String.format("%s : arrivé à %s", this.name, this.noeudActuel));
+            this.noeudActuel = noeudOuAller;
             this.syntheseFourmis = this.syntheseFourmis + " - " + this.noeudActuel;
             //System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
         } catch (InterruptedException ex) {

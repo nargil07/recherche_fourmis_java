@@ -10,10 +10,12 @@ package fr.iutvalence.recherchefourmis.environment;
  * @author antony
  */
 public class Arc {
-    public int pheromones = 1;
+    public Integer pheromones = 1;
     public int metrique = 1;
     public String noeudDep;
     public String noeudFin;
+    
+    private final int maxPheromones = 10;
 
     public Arc(String noeudFin, String noeudDep) {
         this.noeudDep = noeudDep;
@@ -34,6 +36,15 @@ public class Arc {
 
     public void setNoeudFin(String noeudFin) {
         this.noeudFin = noeudFin;
+    }
+    
+    public void addPheromones(int i){
+        synchronized(pheromones){
+            pheromones += i;
+            if(pheromones > maxPheromones){
+                pheromones = maxPheromones;
+            }
+        }
     }
     
     

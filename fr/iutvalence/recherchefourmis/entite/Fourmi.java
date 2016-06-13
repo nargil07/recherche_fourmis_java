@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.iutvalence.recherchefourmis.entite;
 
 import fr.iutvalence.recherchefourmis.environment.Arc;
@@ -13,14 +8,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author jerem
+ * Une fourmis qui est une entité autonomes.
+ * Il suffit de le lancer dans un thread.
+ * @author antony
  */
 public class Fourmi implements Runnable {
 
-    /**
-     * Utile plus tard quand on devra gérer les differentes fourmis.
-     */
     private final Environment environment;
     private final EnumModeFourmis mode;
     private boolean modeAvancer = true;
@@ -30,12 +23,26 @@ public class Fourmi implements Runnable {
     private final String name;
     private String syntheseFourmis;
     /**
-     * Permettra quand on sera arrivé à destination de rebrousser chemin.
+     * Les différents arc parcourus.
      */
     public List<Arc> routeParcourus = new ArrayList<>();
+    /**
+     * Les différents arc qui mennent à un cul de sac.
+     */
     public List<Arc> routeBannis = new ArrayList<>();
+    /**
+     * les differents noeuds parcourus.
+     */
     public List<String> noeudsParcourus = new ArrayList<>();
 
+    /**
+     * Constructeur. Crée une fourmi en lui donnant son environment et son mode
+     * de fonctionnement.
+     *
+     * @param environment
+     * @param mode
+     * @param name le nom que l'on veut donner a la fourmis pour les logs.
+     */
     public Fourmi(Environment environment, EnumModeFourmis mode, String name) {
         this.environment = environment;
         this.mode = mode;
@@ -46,7 +53,7 @@ public class Fourmi implements Runnable {
     }
 
     /**
-     * Fait avancer la fourmis suivant un algo.
+     * La fourmi avance suivant un algorithme.
      */
     public void avancer() {
         Arc arc = choisir();
@@ -66,7 +73,7 @@ public class Fourmi implements Runnable {
                     noeudActuel = noeudOuAller;
                     this.syntheseFourmis = syntheseFourmis + " - " + noeudActuel;
                     System.out.println(String.format("%s : arrivé à %s", this.name, this.noeudActuel));
-                   // System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
+                    // System.out.println(this.name + " : Arrivée au noeud " + noeudActuel);
                 } else {
                     reculer();
                 }
@@ -80,8 +87,9 @@ public class Fourmi implements Runnable {
     }
 
     /**
-     * Fais reculer la fourmis. Il verifie si on est en mode avancer ou non.
-     * Si on est en mode avancer quand il recule il met le chemin comme route bannis.
+     * Fais reculer la fourmis. Il verifie si on est en mode avancer ou non. Si
+     * on est en mode avancer quand il recule il met le chemin comme route
+     * bannis.
      */
     private void reculer() {
         Arc arc = null;
@@ -91,7 +99,7 @@ public class Fourmi implements Runnable {
             if (!modeAvancer) {//si en mode reculer
                 noeudsParcourus.remove(noeudsParcourus.size() - 1);
                 arc.addPheromones(1);
-            }else{
+            } else {
                 routeBannis.add(arc);
             }
             if (arc.getNoeudFin().equals(noeudActuel)) {
@@ -112,8 +120,9 @@ public class Fourmi implements Runnable {
 
     /**
      * Verifie si le chemin à était parcourus.
+     *
      * @param arc
-     * @return 
+     * @return
      */
     private boolean isCheminParcourus(Arc arc) {
         int i = 0;
@@ -134,23 +143,35 @@ public class Fourmi implements Runnable {
     }
 
     /**
-     * Choisir le chemin, en verifiant les chemin parcourus et verifier.
-     * @return 
+     * Choisir le chemin, en verifiant les chemin parcourus.
+     *
+     * @return
      */
     public Arc choisir() {
         Arc result = null;
-
+        //Le total qui aura l'addition de tous les pourcentages
         float total = 0;
-        List<Arc>cheminImpossible = new ArrayList<>(routeBannis);
+        //On remplis une liste de tous les chemins a ne pas parcourires
+        List<Arc> cheminImpossible = new ArrayList<>(routeBannis);
         cheminImpossible.addAll(routeParcourus);
+        //récupere les chemins possible de l'environnement
         Arc[] cheminPossible = environment.getArcsPossible(noeudActuel, cheminImpossible);
+        //crée un tableau de float qui contiendras les pourcentages de prendre 
+        //tel ou tel chemin.
         float[] tabPourcentage = new float[cheminPossible.length];
         for (int i = 0; i < cheminPossible.length; i++) {
             if (i < 1) {
+                /**
+                 * Si c'est le premier chemin que l'on parcours ou calcule le
+                 * pourcentage graçe au calcule
+                 */
                 Arc arc = cheminPossible[i];
                 tabPourcentage[i] = (float) ((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * Math.pow(arc.pheromones, this.mode.getPourcentagePheromones()));
                 total += tabPourcentage[i];
             } else {
+                /**
+                 * Sinon on calcule le pourcentage et on ajoute celui d'avant.
+                 */
                 Arc arc = cheminPossible[i];
                 tabPourcentage[i] = (float) (((1 / Math.pow(arc.metrique, this.mode.getPourcentageMetrique())) * Math.pow(arc.pheromones, this.mode.getPourcentagePheromones())));
                 total += tabPourcentage[i];
@@ -158,10 +179,14 @@ public class Fourmi implements Runnable {
             }
 
         }
-
+        //si il y a des chemins possible.
         if (cheminPossible.length > 0) {
+            //un double contenant un chiffre aléatoire entre 0 et 1.
             double rand = Math.random();
+            
             int i = 0;
+            //tant que le rand et superieur au calcule du pourcentage divisé par
+            //le total on parcours le tableau de pourcentage
             while (rand >= (tabPourcentage[i] / total)) {
                 i++;
             }

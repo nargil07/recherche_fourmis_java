@@ -6,7 +6,7 @@
 package fr.iutvalence.recherchefourmis.entite;
 
 /**
- *
+ * Un enum qui représente le mode de fonctionnement de fourmis.
  * @author antony
  */
 public enum EnumModeFourmis {
@@ -24,6 +24,11 @@ public enum EnumModeFourmis {
     private int pourcentagePheromones;
     private int pourcentageMetrique;
 
+    /**
+     * 
+     * @param pourcentagePheromones
+     * @param pourcentageMetrique 
+     */
     private EnumModeFourmis(int pourcentagePheromones, int pourcentageMetrique) {
         this.pourcentagePheromones = pourcentagePheromones;
         this.pourcentageMetrique = pourcentageMetrique;
